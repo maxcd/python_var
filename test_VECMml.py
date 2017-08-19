@@ -15,3 +15,9 @@ from VECMml import VECM
 p = 2
 r = 2
 model = VECM(data, p, r)
+#print(model.beta)
+model.normalize()
+#print(model.Gamma_norm)
+#print(model.beta)
+model.get_LR_impact()
+print(model.Xi)
