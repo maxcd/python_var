@@ -15,9 +15,36 @@ from VECMml import VECM
 p = 2
 r = 2
 model = VECM(data, p, r)
+
+print('\nReduced form residual covariance matrix Sigma:\n',
+      model.Sigma_u)
 #print(model.beta)
 model.normalize()
 #print(model.Gamma_norm)
 #print(model.beta)
 model.get_LR_impact()
-print(model.Xi)
+print('\nlong run matrix XI:\n', model.Xi)
+
+''' reproduce restrictions from Helmut
+    where 0 means restriced and 1 means unrestricted
+'''
+
+SR = np.ones((3,3))
+SR[1,2] = 0
+SR = SR == 1.
+
+LR = np.zeros((3,3), dtype=int)
+LR[:,0] = 1
+LR = LR == 1.
+
+model.set_restrictions(SR, LR)
+
+B0inv_guess = np.linalg.cholesky(model.Sigma_u)
+#errs = model.restriction_errors(B0inv_guess)
+#print(errs)
+model.get_B0inv()
+#print(model.opt_res)
+
+print('\nResult for B0inv:\n', model.B0inv)
+
+print('\nResult for Upsilon:\n', model.Xi @ model.B0inv)
