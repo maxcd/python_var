@@ -187,39 +187,41 @@ class VECM(object):
         self.SR = SR
         self.LR = LR
         
-    def restriction_errors(self, B0inv):
+    def restriction_errors(self, B0inv_vec):
         Xi = self.Xi
         Sigma = self.Sigma_u
         K = Sigma.shape[0]
         Gamma = self.Gamma
         
+        B0inv = B0inv_vec.reshape((self.K, self.K))
         # short run restrictions from helmut
-        B0inv = B0inv.flatten()
-        SR = ~self.SR.flatten()
+        #0inv = B0inv.flatten()
+        #SR = ~self.SR.flatten()
         
-        B_err = B0inv[SR]
+        B_err = B0inv[~self.SR]
         
         # LR restrictions
-        B0inv_mat = B0inv.reshape((self.K, self.K))
-        Upsilon = Xi @ B0inv_mat
-        Upsilon = Upsilon.flatten()
-        LR = ~self.LR.flatten()
-        Ups_err = Upsilon[LR]
+        
+        Upsilon = Xi @ B0inv
+        #Upsilon = Upsilon.flatten()
+        #LR = ~self.LR.flatten()
+        Ups_err = Upsilon[~self.LR]
      
         # exact identification 'restrictions'
-        Sigma_err = B0inv @ B0inv.transpose() - Sigma
+        Sigma_err = B0inv @ B0inv.T - Sigma
         Sig_err = Sigma_err.flatten()
 
         
         err_vec = np.concatenate([Sig_err, B_err, Ups_err])
         return err_vec
         
-    def get_B0inv(self):
-        b_guess = np.linalg.cholesky(self.Sigma_u)
+    def get_B0inv(self, start=None):
+        if start is None:
+            start = np.random.rand(3,3) #np.linalg.cholesky(self.Sigma_u)
         
-        settings ={'xtol':1e-15, 'ftol':1e-15, 'maxiter':100000000,
-                   'eps':1e-10, 'gtol':1e-10} 
-        opt_res = root(self.restriction_errors, b_guess, method='lm',
+        settings ={'xtol':1e-10, 'ftol':1e-10, 'maxiter':100000000,
+                   'eps':1e-20, 'gtol':1e-20} 
+        opt_res = root(self.restriction_errors, start, method='lm',
                        options=settings)
         
         self.opt_res = opt_res
@@ -288,4 +290,3 @@ class VECM(object):
             #fig.suptitle('Impulse responses', fontsize=16)
             plt.tight_layout()
             return fig
-            #plt.show()

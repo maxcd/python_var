@@ -22,6 +22,7 @@ print('\nReduced form residual covariance matrix Sigma:\n',
       model.Sigma_u)
 #print(model.beta)
 model.normalize()
+A = model.companion
 print('\nComnpanion matrix form of the VAR:\n', model.companion)
 #print(model.beta)
 model.get_LR_impact()
@@ -29,6 +30,7 @@ print('\nshort run estimates Gamma\n:', model.Gamma)
 
 print('\nlong run matrix XI:\n', model.Xi)
 
+print('\nnormalized beta:\n', model.beta)
 ''' reproduce restrictions from Helmut
     where 0 means restriced and 1 means unrestricted
 '''
@@ -43,15 +45,18 @@ LR = LR == 1.
 
 model.set_restrictions(SR, LR)
 
+#np.random.seed(1234)
 B0inv_guess = np.random.rand(3,3)#np.linalg.cholesky(model.Sigma_u)
+guess_helmut =np.array([[ 0.979448879095330, -0.0962679550523870, 1.88600200593293],
+                        [-0.265611268123836, -1.38067086579540, -2.94138589282478],
+                        [-0.548372720057146, -0.728371038269661, 0.980021092332167]])
+guess = guess_helmut.flatten()
 #errs = model.restriction_errors(B0inv_guess)
 #print(errs)
-model.get_B0inv()
+model.get_B0inv(guess)
 #print(model.opt_res)
 
 print('\nResult for B0inv:\n', model.B0inv)
-
-print('\nCompare to cholesky:\n', np.linalg.cholesky(model.Sigma_u))
 
 print('\nResult for Upsilon:\n', model.Xi @ model.B0inv)
 
