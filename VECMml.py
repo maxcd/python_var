@@ -216,6 +216,9 @@ class VECM(object):
         return err_vec
         
     def get_B0inv(self, start=None):
+        '''
+            TODO: add normalization so sign
+        '''
         if start is None:
             start = np.random.rand(3,3) #np.linalg.cholesky(self.Sigma_u)
         

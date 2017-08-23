@@ -45,16 +45,17 @@ LR = LR == 1.
 
 model.set_restrictions(SR, LR)
 
-#np.random.seed(1234)
-B0inv_guess = np.random.rand(3,3)#np.linalg.cholesky(model.Sigma_u)
+# use the same guess that helmut uses
 guess_helmut =np.array([[ 0.979448879095330, -0.0962679550523870, 1.88600200593293],
                         [-0.265611268123836, -1.38067086579540, -2.94138589282478],
                         [-0.548372720057146, -0.728371038269661, 0.980021092332167]])
 guess = guess_helmut.flatten()
-#errs = model.restriction_errors(B0inv_guess)
-#print(errs)
+
+# it also works with a random guess
+rand_guess = np.random.rand(3,3)
+guess = rand_guess.flatten()
+
 model.get_B0inv(guess)
-#print(model.opt_res)
 
 print('\nResult for B0inv:\n', model.B0inv)
 
