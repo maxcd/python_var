@@ -79,7 +79,6 @@ class VECM(object):
         Smat = iS11sq @ S01.transpose() @ la.pinv(S00) @ S01 @ iS11sq
 
         ''' compute the ML estmates for alpha and beta '''
-        #print(S01) # this is actually very diffent from the matrix in Helmuts code..dont know why
         eigenvals, eigenvecs = la.eig(Smat, right=True)
         index = np.argsort(eigenvals)[::-1]
         eigenvals = eigenvals[index]
@@ -88,11 +87,10 @@ class VECM(object):
         B = eigenvecs[:,index]
         B = -B
 
-        'compute estimates of the long run parameters'
         beta = iS11sq @ B[:,:r]
         alpha = S01 @ beta @ la.pinv(beta.transpose() @ S11 @ beta)
 
-        'compute the short-run parameters for the differences terms'
+        'compute the short-run parameters for the differenced terms'
         Gamma = ( (dy - alpha @ beta.transpose() @ y) @ X.transpose() @
                  la.pinv(X @ Xt) )
 
@@ -234,7 +232,7 @@ class VECM(object):
         for col in range(B0inv.shape[1]):
             if B0inv[col, col] < 0:
                 B0inv[:,col] = B0inv[:,col] * -1
-        
+
         self.B0inv = B0inv
 
     def get_irfs(self, nsteps, B=None, plot=False, imps=None, resps=None):
